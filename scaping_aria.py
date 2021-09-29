@@ -1,7 +1,8 @@
 import json
 from bs4 import BeautifulSoup
 import requests
-
+from cofig import host, user, password, db_name
+import psycopg2
 
 def get_data(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, '
@@ -34,6 +35,22 @@ def get_data(url):
     resp = open('aria_albumn.json', 'w+', encoding='utf-8')
     json.dump(result_json, resp, ensure_ascii=False, indent=4)
 
+    try:
+        connection = psycopg2.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=db_name
+        )
+        connection.autocommit = True
 
+
+    except Exception as _ex:
+        print("[INFO] Error while working with PostgreSQL", _ex)
+    finally:
+        if connection:
+            # cursor.close()
+            connection.close()
+            print("[INFO] PostgreSQL connection closed")
 
 get_data('https://ru.wikipedia.org/wiki/Дискография_группы_«Ария»#Студийные_альбомы')
